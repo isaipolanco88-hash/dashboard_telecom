@@ -190,7 +190,7 @@ body { font-family:'Segoe UI',system-ui,sans-serif; background:var(--slate); col
 /* ═══════════════════════════════════════════
    TWO-COL PANELS
 ═══════════════════════════════════════════ */
-.two-col { display:grid; grid-template-columns:2fr 1fr; gap:16px; margin-bottom:18px; }
+.two-col { display:block; margin-bottom:18px; }
 .panel {
   background:var(--white);
   border-radius:12px; padding:18px 20px;
@@ -237,6 +237,7 @@ body { font-family:'Segoe UI',system-ui,sans-serif; background:var(--slate); col
    SITE TABLE
 ═══════════════════════════════════════════ */
 .tbl-panel { background:var(--white); border-radius:12px; box-shadow:0 1px 4px rgba(0,0,0,.05); overflow:hidden; }
+#siteTable { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .tbl-header {
   padding:14px 18px; border-bottom:1px solid var(--border);
   display:flex; align-items:center; gap:8px; flex-wrap:wrap;
@@ -360,7 +361,7 @@ tbody tr:hover { background:#fafafa; }
 .tv-overlay.open { display:flex; }
 .tv-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; }
 .tv-title { color:#fff; font-size:22px; font-weight:800; }
-.tv-time  { color:rgba(255,255,255,.6); font-size:16px; }
+.tv-time  { color:rgba(255,255,255,.6); font-size:16px; margin-right:110px; }
 .tv-kpis  { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-bottom:24px; }
 .tv-kpi {
   background:rgba(255,255,255,.06);
@@ -388,7 +389,6 @@ tbody tr:hover { background:#fafafa; }
 @media (max-width:1100px) { .kpi-grid { grid-template-columns:repeat(3,1fr); } }
 @media (max-width:860px)  {
   .kpi-grid { grid-template-columns:repeat(2,1fr); }
-  .two-col  { grid-template-columns:1fr; }
   .forecast-strip { grid-template-columns:1fr 1fr; }
 }
 @media (max-width:540px)  {
@@ -402,7 +402,10 @@ tbody tr:hover { background:#fafafa; }
 
 <!-- ══════════════ HEADER ══════════════ -->
 <header class="header">
-  <div class="h-brand" id="hBrand">📡 Telecom</div>
+  <div class="h-brand" style="display:flex; align-items:center; gap:8px;">
+    <img src="https://github.com/isaipolanco88-hash/dashboard_telecom/blob/main/logo-telecom.png?raw=true" alt="Telecom Logo" style="height:32px;">
+    <span id="hBrandText">📡 Telecom</span>
+  </div>
   <div class="h-sep"></div>
   <div class="h-meta" id="hMeta">—</div>
   <div class="health-pill hp-amber" id="hPill">
@@ -461,10 +464,6 @@ tbody tr:hover { background:#fafafa; }
     <div class="panel">
       <div class="panel-title">📊 Avance por SITE <em>— coloreado por prioridad</em></div>
       <canvas id="barChart"></canvas>
-    </div>
-    <div class="panel">
-      <div class="panel-title">🚧 Cuellos de Botella <em>— pendientes por disciplina</em></div>
-      <div id="bnTable"><div class="loading-cell"><div class="spinner"></div></div></div>
     </div>
   </div>
 
@@ -574,6 +573,7 @@ let CFG = {
 
 let barChart = null, tvChart = null;
 let allSites = [];
+let allExtraCols = [];
 let activeFilter = 'all';
 let tvInterval = null;
 
@@ -870,42 +870,7 @@ function renderChart(sites) {
   });
 }
 
-/* ═══════════════════════════════════════════════
-   RENDER: BOTTLENECK TABLE
-═══════════════════════════════════════════════ */
-function renderBottleneck(disciplines, totalSites) {
-  const el = document.getElementById('bnTable');
-  if (!disciplines || !Object.keys(disciplines).length) {
-    el.innerHTML = '<div class="empty-state">Sin datos de disciplinas</div>';
-    return;
-  }
 
-  const rows = Object.entries(disciplines).map(([name, d]) => {
-    // If the API returns a 'pending' count, use it; else estimate from progress
-    const pending = d.pending !== undefined
-      ? d.pending
-      : Math.round((1 - (d.progress || 0) / 100) * (totalSites || 10));
-    return { name, pending, progress: d.progress || 0 };
-  }).sort((a,b) => b.pending - a.pending);
-
-  const max = Math.max(...rows.map(r => r.pending), 1);
-
-  el.innerHTML = `<div class="bn-rows">` + rows.map(r => {
-    const pct   = (r.pending / max) * 100;
-    const color = pct > 70 ? 'var(--red)' : pct > 40 ? 'var(--amber)' : 'var(--green)';
-    return `
-      <div class="bn-row">
-        <div>
-          <div class="bn-disc">${r.name}</div>
-          <div class="bn-bar-bg"><div class="bn-bar-fg" style="width:${pct}%;background:${color}"></div></div>
-        </div>
-        <div>
-          <div class="bn-num">${r.pending}</div>
-          <div class="bn-unit">pendientes</div>
-        </div>
-      </div>`;
-  }).join('') + `</div>`;
-}
 
 /* ═══════════════════════════════════════════════
    RENDER: RISK PANEL
@@ -964,7 +929,7 @@ function renderRisks(data, sites) {
 /* ═══════════════════════════════════════════════
    RENDER: SITE TABLE
 ═══════════════════════════════════════════════ */
-function renderSiteTable(sites, filter) {
+function renderSiteTable(sites, filter, extraCols = []) {
   const el = document.getElementById('siteTable');
   let rows = [...sites];
 
@@ -989,6 +954,7 @@ function renderSiteTable(sites, filter) {
         <th>Aging</th>
         <th>Estado</th>
         <th>Bloqueo</th>
+        ${extraCols.map(c => `<th>${c}</th>`).join('')}
         <th></th>
       </tr>
     </thead>
@@ -1031,6 +997,7 @@ function renderSiteTable(sites, filter) {
           <td>${agHtml}</td>
           <td><div style="display:flex;align-items:center;">${status}</div></td>
           <td>${motivo}</td>
+          ${extraCols.map(c => `<td>${(s.extras && s.extras[c]) || '—'}</td>`).join('')}
           <td><button class="btn-sm" onclick="verDetalle('${s.site}')">Ver →</button></td>
         </tr>`;
       }).join('')}
@@ -1045,7 +1012,7 @@ function setFilter(filter, btn) {
   activeFilter = filter;
   document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('on'));
   btn.classList.add('on');
-  renderSiteTable(allSites, filter);
+  renderSiteTable(allSites, filter, allExtraCols);
 }
 
 /* ═══════════════════════════════════════════════
@@ -1071,6 +1038,7 @@ async function cargarDatos() {
     }));
     sites.forEach(s => { s.priority = calcPriority(s); });
     allSites = sites;
+    allExtraCols = data.extraColumns || [];
 
     const health = calcHealth(data, sites);
 
@@ -1079,16 +1047,15 @@ async function cargarDatos() {
     renderAlerts(data, sites);
     renderKPIs(data, sites, health);
     renderChart(sites);
-    renderBottleneck(data.disciplines, data.totalSites);
     renderRisks(data, sites);
-    renderSiteTable(sites, activeFilter);
+    renderSiteTable(sites, activeFilter, allExtraCols);
 
     // TV KPIs (update if TV is open)
     updateTVKPIs(data, health);
 
     const now = new Date().toLocaleTimeString('es-MX', { hour:'2-digit', minute:'2-digit' });
     document.getElementById('hMeta').textContent = `🕒 Actualizado ${now}`;
-    document.getElementById('hBrand').textContent = `📡 ${CFG.name}`;
+    document.getElementById('hBrandText').textContent = `📡 ${CFG.name}`;
 
   } catch (err) {
     console.error(err);
@@ -1168,7 +1135,6 @@ function saveConfig() {
 let tvChartInst = null;
 
 function updateTVKPIs(data, health) {
-  if (!document.getElementById('tvOverlay').classList.contains('open')) return;
   const hMap = { green:'🟢 En Línea', amber:'🟡 En Riesgo', red:'🔴 Crítico' };
   document.getElementById('tvHealth').textContent    = hMap[health] || '—';
   document.getElementById('tvHealthSub').textContent = `${data.blocked || 0} bloqueadas · ${allSites.filter(s=>s.priority==='critical').length} críticas`;
@@ -1222,7 +1188,7 @@ function closeTV() {
    INIT
 ═══════════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('hBrand').textContent = `📡 ${CFG.name}`;
+  document.getElementById('hBrandText').textContent = `📡 ${CFG.name}`;
   cargarDatos();
   // Auto-refresh cada 60 min
   setInterval(cargarDatos, 60 * 60 * 1000);
