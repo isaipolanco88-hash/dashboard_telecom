@@ -460,7 +460,7 @@ tbody tr:hover { background:#fafafa; }
   </div>
 
   <!-- ══════════════ CHARTS + BOTTLENECK ══════════════ -->
-  <div class="two-col">
+  <div class="two-col" style="max-width: 900px;">
     <div class="panel">
       <div class="panel-title">📊 Avance por SITE <em>— coloreado por prioridad</em></div>
       <canvas id="barChart"></canvas>
@@ -614,6 +614,15 @@ function daysBetween(a, b) {
   const da = new Date(a), db = new Date(b);
   if (isNaN(da) || isNaN(db)) return null;
   return Math.floor((db - da) / 86400000);
+}
+
+function formatSpanishDate(dateString) {
+  if (!dateString) return '';
+  const d = new Date(dateString);
+  if (isNaN(d)) return dateString;
+  const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+  const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+  return `${days[d.getDay()]}, ${d.getDate()} de ${months[d.getMonth()]} del ${d.getFullYear()}`;
 }
 
 function expectedProgress() {
@@ -1014,7 +1023,7 @@ function renderSiteTable(sites, filter, extraCols = []) {
 
         return `<tr>
           <td>${pbadge}</td>
-          <td><strong>${s.site}</strong>${s.fechaInicio ? `<br><span style="font-size:10px;color:var(--muted);">Inicio: ${s.fechaInicio}</span>` : ''}</td>
+          <td><strong>${s.site}</strong>${s.fechaInicio ? `<br><span style="font-size:10px;color:var(--muted);">Inicio: ${formatSpanishDate(s.fechaInicio)}</span>` : ''}</td>
           <td>
             <div class="prog-cell">
               <div class="prog-bg"><div class="prog-fg ${pfClass}" style="width:${p}%"></div></div>
@@ -1136,8 +1145,8 @@ async function verDetalle(site) {
         : '';
         
       const photoHtml = a.foto 
-        ? `<div style="margin-top: 10px;"><a href="${a.foto}" target="_blank" style="text-decoration: none; display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px; background: var(--blue-lt); color: #fff; border-radius: 6px; font-size: 11px; font-weight: 600; transition: background 0.2s;">📸 Ver Evidencia (Drive)</a></div>`
-        : '';
+        ? `<div style="margin-top: 8px;"><a href="${a.foto}" target="_blank" style="font-size: 11px; font-weight: 600; color: var(--blue); text-decoration: none; display: inline-flex; align-items: center; gap: 4px;"><span style="font-size:14px">📷</span> Ver Foto (Drive)</a></div>`
+        : `<div style="margin-top: 8px; font-size: 11px; font-weight: 600; color: var(--muted); display: inline-flex; align-items: center; gap: 4px;"><span style="font-size:14px; filter: grayscale(1); opacity: 0.5;">📷</span> Sin foto asignada</div>`;
 
       return `
         <div style="border: 1px solid var(--border); border-radius: 8px; padding: 14px; background: var(--white); box-shadow: 0 1px 3px rgba(0,0,0,.02);">
