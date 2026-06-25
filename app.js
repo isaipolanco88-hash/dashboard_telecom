@@ -669,28 +669,35 @@ async function verDetalle(site) {
       return;
     }
 
-    document.getElementById('dmActivities').innerHTML = d.activities.map(a => {
+      document.getElementById('dmActivities').innerHTML = d.activities.map(a => {
       const color = a.avance === 100 ? '#065f46' : a.avance > 0 ? '#92400e' : 'var(--muted)';
       const bg = a.avance === 100 ? 'var(--green-bg)' : a.avance > 0 ? 'var(--amber-bg)' : '#e2e8f0';
       const border = a.avance === 100 ? 'rgba(16,185,129,.3)' : a.avance > 0 ? 'rgba(245,158,11,.3)' : 'var(--border)';
       
       const dueBadgeHtml = activityDueBadge(a.fechaVencimiento || '');
 
-      const commentText = a.comentario || a.notas;
+      // Aseguramos que atrape las notas sin importar si están en mayúsculas o minúsculas
+      const commentText = a.comentario || a.notas || a.NOTAS;
       const commentHtml = commentText 
         ? `<div style="font-size: 11px; margin-top: 8px; padding: 8px 12px; background: #f8fafc; border-left: 3px solid var(--blue-lt); border-radius: 4px; color: var(--text);">💬 <strong>Comentario:</strong> ${commentText}</div>` 
         : '';
         
-      const photoHtml = a.foto 
-        ? `<div style="margin-top: 8px;"><a href="${a.foto}" target="_blank" style="font-size: 11px; font-weight: 600; color: var(--blue); text-decoration: none; display: inline-flex; align-items: center; gap: 4px;"><span style="font-size:14px">📷</span> Ver Foto (Drive)</a></div>`
+      // CORRECCIÓN 2: Validamos mayúsculas/minúsculas para la columna de la foto
+      const urlFoto = a.foto || a.FOTO;
+      const photoHtml = urlFoto 
+        ? `<div style="margin-top: 8px;"><a href="${urlFoto}" target="_blank" style="font-size: 11px; font-weight: 600; color: var(--blue); text-decoration: none; display: inline-flex; align-items: center; gap: 4px;"><span style="font-size:14px">📷</span> Ver Foto (Drive)</a></div>`
         : `<div style="margin-top: 8px; font-size: 11px; font-weight: 600; color: var(--muted); display: inline-flex; align-items: center; gap: 4px;"><span style="font-size:14px; filter: grayscale(1); opacity: 0.5;">📷</span> Sin foto asignada</div>`;
 
       return `
         <div style="border: 1px solid var(--border); border-radius: 8px; padding: 14px; background: var(--white); box-shadow: 0 1px 3px rgba(0,0,0,.02);">
           <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
-            <div style="font-weight: 600; font-size: 13px; color: var(--navy); line-height: 1.4;">${a.actividad}</div>
+            
+            <div style="font-weight: 600; font-size: 13px; color: var(--navy); line-height: 1.4;">
+              ${a.disciplina || a.DISCIPLINA || 'Sin título'}
+            </div>
+            
             <div style="background: ${bg}; color: ${color}; padding: 3px 8px; border-radius: 999px; font-size: 10px; font-weight: 700; white-space: nowrap; border: 1px solid ${border};">
-              ${a.avance}% — ${a.estado}
+              ${a.avance}% — ${a.estado || a.ESTADO}
             </div>
           </div>
           ${dueBadgeHtml}
