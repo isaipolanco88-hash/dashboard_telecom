@@ -3,6 +3,71 @@
 ═══════════════════════════════════════════════ */
 const API_URL = 'https://script.google.com/macros/s/AKfycby52cJlCYBVCvN071IyG8puX8ilWDAmHxSlcRX4Lan4PwrjFlapjM-96JPH6t1wMmRs2A/exec';
 
+/* ═══════════════════════════════════════════════
+   SESSION & AUTHENTICATION
+═══════════════════════════════════════════════ */
+let AUTH_TOKEN = localStorage.getItem('t_token') || null;
+let USER_ROLE = localStorage.getItem('t_role') || null;
+
+function checkAuth() {
+  if (!AUTH_TOKEN) {
+    document.body.classList.add('is-logged-out');
+    document.body.classList.remove('is-admin', 'is-viewer');
+    document.getElementById('loginScreen').classList.add('open');
+    document.getElementById('btnLogout').style.display = 'none';
+    return false;
+  }
+  document.body.classList.remove('is-logged-out');
+  document.body.classList.add(USER_ROLE === 'admin' ? 'is-admin' : 'is-viewer');
+  document.getElementById('loginScreen').classList.remove('open');
+  document.getElementById('btnLogout').style.display = 'inline-block';
+  return true;
+}
+
+async function doLogin() {
+  const pin = document.getElementById('loginPin').value.trim();
+  const err = document.getElementById('loginError');
+  if(!pin) return;
+  
+  err.innerText = "Autenticando...";
+  try {
+    const { json } = await fetchWithRetry(`${API_URL}?action=getConfig&t=${Date.now()}`);
+    if (json.success) {
+      const pAdmin = String(json.data.pin_admin || "0000").trim();
+      const pGuest = String(json.data.pin_guest || "1111").trim();
+      
+      if (pin === pAdmin) {
+        localStorage.setItem('t_token', pin);
+        localStorage.setItem('t_role', 'admin');
+      } else if (pin === pGuest) {
+        localStorage.setItem('t_token', pin);
+        localStorage.setItem('t_role', 'viewer');
+      } else {
+        err.innerText = "PIN incorrecto";
+        return;
+      }
+      
+      AUTH_TOKEN = pin;
+      USER_ROLE = localStorage.getItem('t_role');
+      err.innerText = "";
+      document.getElementById('loginPin').value = "";
+      if (checkAuth()) cargarDatos();
+    } else {
+      err.innerText = json.error || "Error de conexión";
+    }
+  } catch(e) {
+    err.innerText = "Error de red";
+  }
+}
+
+function logout() {
+  localStorage.removeItem('t_token');
+  localStorage.removeItem('t_role');
+  AUTH_TOKEN = null;
+  USER_ROLE = null;
+  checkAuth();
+}
+
 let CFG = {
   name:     'Proyecto Telecom',
   start:    '',
@@ -513,7 +578,8 @@ function setFilter(filter, btn) {
    MAIN: LOAD DATA
 ═══════════════════════════════════════════════ */
 async function cargarDatos() {
-  document.getElementById('hMeta').textContent = 'Actualizando…';
+  if (!checkAuth()) return;
+  document.getElementById('siteTable').innerHTML = '<div class="loading-cell"><div class="spinner"></div><p>Actualizando datos…</p></div>';
   try {
     const url  = `${API_URL}?action=getDashboard&t=${Date.now()}`;
     const { json } = await fetchWithRetry(url);
@@ -641,7 +707,7 @@ async function verDetalle(site) {
 ═══════════════════════════════════════════════ */
 async function actualizarSite(siteName, field, value) {
   try {
-    const params = new URLSearchParams({ action: 'updateSite', site: siteName, [field]: value, t: Date.now() });
+    const params = new URLSearchParams({ action:'updateSite', site:siteName, [field]:value, token:(AUTH_TOKEN||'') }).toString();
     const res = await fetch(`${API_URL}?${params}`);
     const json = await res.json();
     if (!json.success) throw new Error(json.error);
@@ -665,7 +731,7 @@ async function confirmarNuevoSite() {
   if (!name) { alert('El nombre del SITE es requerido.'); return; }
   document.getElementById('nuevoSiteOverlay').classList.remove('open');
   try {
-    const url = `${API_URL}?action=createSite&siteName=${encodeURIComponent(name)}&responsable=${encodeURIComponent(resp)}&t=${Date.now()}`;
+    const url = `${API_URL}?action=createSite&siteName=${encodeURIComponent(name)}&responsable=${encodeURIComponent(resp)}&token=${encodeURIComponent(AUTH_TOKEN||'')}&t=${Date.now()}`;
     const res = await fetch(url);
     const json = await res.json();
     if (!json.success) throw new Error(json.error);
@@ -728,7 +794,7 @@ async function saveConfig() {
   cargarDatos();
   try {
     const p = new URLSearchParams({ action:'saveConfig', nombre, inicio, cierre,
-      meta: String(meta), inactividad: String(inact), t: Date.now() });
+      meta: String(meta), inactividad: String(inact), token:(AUTH_TOKEN||''), t: Date.now() }).toString();
     await fetch(`${API_URL}?${p}`);
   } catch(_) { /* localStorage cache still works */ }
 }
@@ -793,7 +859,7 @@ function closeTV() {
 ═══════════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('hBrandText').textContent = `📡 ${CFG.name}`;
-  cargarDatos();
+  if (checkAuth()) cargarDatos();
   // Auto-refresh cada 60 min
-  setInterval(cargarDatos, 60 * 60 * 1000);
+  setInterval(() => { if (checkAuth()) cargarDatos(); }, 60 * 60 * 1000);
 });
