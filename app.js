@@ -590,15 +590,16 @@ async function cargarDatos() {
     const data = json.data;
 
     // Enrich sites
-    const sites = (data.sitesProgress || []).map(s => ({
-      ...s,
-      blocked:    s.blocked || false,
-      motivo:     s.motivo || null,
-      fechaInicio:s.fechaInicio || null,
-    }));
-    sites.forEach(s => { s.priority = calcPriority(s); });
-    allSites = sites;
-    allExtraCols = data.extraColumns || [];
+   const sites = (data.sites || data.sitesProgress || []).map(s => ({
+  ...s,
+  blocked:     s.blocked || s.bloqueado || false,
+  motivo:      s.motivo || null,
+  comentario:  s.trabajos || s.comentario || null,
+  fechaInicio: s.fechaInicio || null,
+}));
+sites.forEach(s => { s.priority = calcPriority(s); });
+allSites = sites;
+allExtraCols = data.extraCols || data.extraColumns || [];
 
     const health = calcHealth(data, sites);
 
