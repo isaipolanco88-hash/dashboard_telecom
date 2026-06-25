@@ -10,16 +10,17 @@ let AUTH_TOKEN = localStorage.getItem('t_token') || null;
 let USER_ROLE = localStorage.getItem('t_role') || null;
 
 function checkAuth() {
+  const loginScreen = document.getElementById('loginScreen');
   if (!AUTH_TOKEN) {
     document.body.classList.add('is-logged-out');
     document.body.classList.remove('is-admin', 'is-viewer');
-    document.getElementById('loginScreen').classList.add('open');
+    loginScreen.style.display = 'flex';
     document.getElementById('btnLogout').style.display = 'none';
     return false;
   }
   document.body.classList.remove('is-logged-out');
   document.body.classList.add(USER_ROLE === 'admin' ? 'is-admin' : 'is-viewer');
-  document.getElementById('loginScreen').classList.remove('open');
+  loginScreen.style.display = 'none';
   document.getElementById('btnLogout').style.display = 'inline-block';
   return true;
 }
