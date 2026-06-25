@@ -82,7 +82,7 @@
     <div class="kpi"><div class="loading-cell"></div></div>
   </div>
 
-  <!-- ══════════════ CHARTS + BOTTLENECK ══════════════ -->
+  <!-- ══════════════ CHARTS ══════════════ -->
   <div class="two-col" style="max-width: 900px;">
     <div class="panel">
       <div class="panel-title">📊 Avance por SITE <em>— coloreado por prioridad</em></div>
@@ -161,206 +161,18 @@
       <span id="dmTitle">📋 Detalle del SITE</span>
       <button class="btn-sc" style="padding: 4px 10px;" onclick="closeDetail()">✕</button>
     </div>
-    
     <div style="display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 16px; background: var(--slate); padding: 12px; border-radius: 8px; font-size: 12px;">
       <div><strong>Completadas:</strong> <span id="dmComp">—</span></div>
       <div><strong>Pendientes:</strong> <span id="dmPend">—</span></div>
       <div><strong>Avance:</strong> <span id="dmAvance">—</span></div>
       <div><strong>Responsable:</strong> <span id="dmResp">—</span></div>
     </div>
-
     <div style="flex: 1; overflow-y: auto; padding-right: 8px;">
       <div style="font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin-bottom: 10px;">Actividades</div>
       <div id="dmActivities" style="display: flex; flex-direction: column; gap: 10px;">
         <!-- Activities -->
       </div>
     </div>
-    
-    <div class="modal-actions" style="margin-top: 20px;">
-      <button class="btn-pr" onclick="closeDetail()">Cerrar</button>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════════ TV MODE ══════════════ -->
-<div class="tv-overlay" id="tvOverlay">
-  <button class="tv-close" onclick="closeTV()">✕ Salir TV</button>
-  <div class="tv-header">
-    <div class="tv-title" id="tvTitle">📡 Telecom — Monitoreo en Vivo</div>
-    <div class="tv-time" id="tvTime">--:--</div>
-  </div>
-  <div class="tv-kpis">
-    <div class="tv-kpi">
-      <div class="tv-kpi-label">Salud General</div>
-      <div class="tv-kpi-value" id="tvHealth" style="font-size:32px;">—</div>
-      <div class="tv-kpi-sub" id="tvHealthSub">—</div>
-    </div>
-    <div class="tv-kpi">
-      <div class="tv-kpi-label">Avance Promedio</div>
-      <div class="tv-kpi-value" id="tvAvg">—</div>
-      <div class="tv-kpi-sub" id="tvAvgSub">—</div>
-    </div>
-    <div class="tv-kpi">
-      <div class="tv-kpi-label">Sites Completadas</div>
-      <div class="tv-kpi-value" id="tvComp">—</div>
-      <div class="tv-kpi-sub" id="tvCompSub">—</div>
-    </div>
-  </div>
-  <div class="tv-chart-box">
-    <canvas id="tvChart"></canvas>
-  </div>
-</div>
-
-<!-- ══════════════ NUEVO SITE MODAL ══════════════ -->
-<div class="overlay" id="nuevoSiteOverlay">
-  <div class="modal">
-    <div class="modal-title">➕ Nuevo SITE</div>
-    <div class="fg">
-      <label>Nombre del SITE</label>
-      <input type="text" id="nsNombre" placeholder="Ej. SITE-007">
-    </div>
-    <div class="fg">
-      <label>Responsable</label>
-      <input type="text" id="nsResp" placeholder="Ej. Juan Pérez">
-    </div>
-    <div class="modal-actions">
-      <button class="btn-sc" onclick="document.getElementById('nuevoSiteOverlay').classList.remove('open')">Cancelar</button>
-      <button class="btn-pr" onclick="confirmarNuevoSite()">Crear SITE</button>
-    </div>
-  </div>
-</div>
-
-<script src="./app.js"></script>
-</body>
-</html>
-  <!-- ══════════════ FORECAST STRIP ══════════════ -->
-  <div class="forecast-strip" id="fStrip">
-    <div>
-      <div class="fs-label">Avance Real</div>
-      <div class="fs-value t-blue" id="fReal">--%</div>
-    </div>
-    <div class="fs-track-wrap">
-      <div class="fs-sub" id="fPeriod">Progreso del periodo</div>
-      <div class="fs-track">
-        <div class="fs-actual" id="fBar" style="width:0%;background:var(--blue-lt)"></div>
-        <div class="fs-expected-line" id="fExpLine" style="display:none"></div>
-        <div class="fs-expected-label" id="fExpLabel" style="display:none"></div>
-      </div>
-    </div>
-    <div>
-      <div class="fs-label">Meta al Cierre</div>
-      <div class="fs-value" id="fTarget" style="color:var(--muted)">—</div>
-    </div>
-    <div>
-      <div class="fs-label">Diferencia</div>
-      <div class="fs-gap gap-na" id="fGap">Configura ⚙️</div>
-    </div>
-  </div>
-
-  <!-- ══════════════ KPI GRID ══════════════ -->
-  <div class="kpi-grid" id="kpiGrid">
-    <div class="kpi"><div class="loading-cell"><div class="spinner"></div></div></div>
-    <div class="kpi"><div class="loading-cell"></div></div>
-    <div class="kpi"><div class="loading-cell"></div></div>
-    <div class="kpi"><div class="loading-cell"></div></div>
-    <div class="kpi"><div class="loading-cell"></div></div>
-    <div class="kpi"><div class="loading-cell"></div></div>
-  </div>
-
-  <!-- ══════════════ CHARTS + BOTTLENECK ══════════════ -->
-  <div class="two-col" style="max-width: 900px;">
-    <div class="panel">
-      <div class="panel-title">📊 Avance por SITE <em>— coloreado por prioridad</em></div>
-      <canvas id="barChart"></canvas>
-    </div>
-  </div>
-
-  <!-- ══════════════ RISK PANEL ══════════════ -->
-  <div class="risk-panel">
-    <div class="panel-title">🔍 Próximos Riesgos <em>— generados automáticamente</em></div>
-    <div class="risk-grid" id="riskGrid"><p style="color:var(--muted);font-size:13px;">Calculando…</p></div>
-  </div>
-
-  <!-- ══════════════ SITE TABLE ══════════════ -->
-  <div class="tbl-panel">
-    <div class="tbl-header">
-      <div class="tbl-title">📋 Detalle por SITE</div>
-      <button class="filter-pill on" onclick="setFilter('all',this)">Todos</button>
-      <button class="filter-pill" onclick="setFilter('critical',this)">🔴 Críticos</button>
-      <button class="filter-pill" onclick="setFilter('risk',this)">🟡 Riesgo</button>
-      <button class="filter-pill" onclick="setFilter('blocked',this)">🚫 Bloqueados</button>
-      <button class="filter-pill" onclick="setFilter('inactive',this)">⏰ Inactivos</button>
-      <select id="filterResp" onchange="applyFilters()" style="padding:4px 10px;border-radius:999px;font-size:11px;font-weight:600;border:1.5px solid var(--border);background:var(--white);color:var(--muted);cursor:pointer;">
-        <option value="">👤 Todos</option>
-      </select>
-      <button class="hbtn" style="background:#f1f5f9;color:var(--navy);" onclick="nuevoSite()">➕ Nuevo</button>
-    </div>
-    <div id="siteTable"><div class="loading-cell"><div class="spinner"></div><p>Cargando sites…</p></div></div>
-  </div>
-
-</div><!-- /wrap -->
-
-<!-- ══════════════ CONFIG MODAL ══════════════ -->
-<div class="overlay" id="cfgOverlay">
-  <div class="modal">
-    <div class="modal-title">⚙️ Configuración del Proyecto</div>
-    <div class="modal-hint">
-      Estos valores se guardan en tu navegador.<br>
-      Ajusta la meta y las fechas para activar el <strong>forecast</strong> y el cálculo de <strong>riesgos automáticos</strong>.
-    </div>
-    <div class="fg">
-      <label>Nombre del Proyecto</label>
-      <input type="text" id="cName" placeholder="Ej. Rollout Q2 2025">
-    </div>
-    <div class="fg-row">
-      <div class="fg">
-        <label>Fecha Inicio del Proyecto</label>
-        <input type="date" id="cStart">
-      </div>
-      <div class="fg">
-        <label>Fecha Límite (Cierre)</label>
-        <input type="date" id="cEnd">
-      </div>
-    </div>
-    <div class="fg-row">
-      <div class="fg">
-        <label>Meta de Avance al Cierre (%)</label>
-        <input type="number" id="cTarget" min="0" max="100" placeholder="Ej. 80">
-      </div>
-      <div class="fg">
-        <label>Alertar si sin actividad (días)</label>
-        <input type="number" id="cInact" min="1" placeholder="Ej. 15">
-      </div>
-    </div>
-    <div class="modal-actions">
-      <button class="btn-sc" onclick="closeConfig()">Cancelar</button>
-      <button class="btn-pr" onclick="saveConfig()">Guardar y Recargar</button>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════════ DETAIL MODAL ══════════════ -->
-<div class="overlay" id="detailOverlay">
-  <div class="modal" style="width: 580px; max-width: 95vw; display: flex; flex-direction: column; max-height: 85vh;">
-    <div class="modal-title" style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
-      <span id="dmTitle">📋 Detalle del SITE</span>
-      <button class="btn-sc" style="padding: 4px 10px;" onclick="closeDetail()">✕</button>
-    </div>
-    
-    <div style="display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 16px; background: var(--slate); padding: 12px; border-radius: 8px; font-size: 12px;">
-      <div><strong>Completadas:</strong> <span id="dmComp">—</span></div>
-      <div><strong>Pendientes:</strong> <span id="dmPend">—</span></div>
-      <div><strong>Avance:</strong> <span id="dmAvance">—</span></div>
-      <div><strong>Responsable:</strong> <span id="dmResp">—</span></div>
-    </div>
-
-    <div style="flex: 1; overflow-y: auto; padding-right: 8px;">
-      <div style="font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin-bottom: 10px;">Actividades</div>
-      <div id="dmActivities" style="display: flex; flex-direction: column; gap: 10px;">
-        <!-- Activities -->
-      </div>
-    </div>
-    
     <div class="modal-actions" style="margin-top: 20px;">
       <button class="btn-pr" onclick="closeDetail()">Cerrar</button>
     </div>
