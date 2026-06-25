@@ -278,11 +278,12 @@ function renderAlerts(data, sites) {
    RENDER: KPIs
 ═══════════════════════════════════════════════ */
 function renderKPIs(data, sites, health) {
-  const total     = data.totalSites || 0;
-  const completed = data.completed  || 0;
-  const pending   = data.pending    || 0;
-  const blocked   = data.blocked    || 0;
-  const avg       = data.avgProgress|| 0;
+  const s         = data.summary || data;
+  const total     = s.total     || sites.length || 0;
+  const completed = s.completed || 0;
+  const pending   = s.pending   || 0;
+  const blocked   = s.blocked   || 0;
+  const avg       = s.avgProgress || data.avgProgress || 0;
   const exp       = expectedProgress();
   const criticals = sites.filter(s => s.priority === 'critical').length;
   const risks     = sites.filter(s => s.priority === 'risk').length;
