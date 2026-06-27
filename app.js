@@ -682,18 +682,17 @@ async function verDetalle(site) {
         ? `<div style="font-size: 11px; margin-top: 8px; padding: 8px 12px; background: #f8fafc; border-left: 3px solid var(--blue-lt); border-radius: 4px; color: var(--text);">💬 <strong>Comentario:</strong> ${commentText}</div>` 
         : '';
         
-      // CORRECCIÓN 2: Validamos mayúsculas/minúsculas para la columna de la foto
+           // CORRECCIÓN 2: Validamos mayúsculas/minúsculas para la columna de la foto
       const urlFoto = a.foto || a.FOTO;
       const photoHtml = urlFoto 
-        ? `<div style="margin-top: 8px;"><a href="${urlFoto}" target="_blank" style="font-size: 11px; font-weight: 600; color: var(--blue); text-decoration: none; display: inline-flex; align-items: center; gap: 4px;"><span style="font-size:14px">📷</span> Ver Foto (Drive)</a></div>`
-        : `<div style="margin-top: 8px; font-size: 11px; font-weight: 600; color: var(--muted); display: inline-flex; align-items: center; gap: 4px;"><span style="font-size:14px; filter: grayscale(1); opacity: 0.5;">📷</span> Sin foto asignada</div>`;
+        ? `<div style="margin-top: 8px;"><a href="${urlFoto}" target="_blank" style="font-size: 11px; font-weight: 600; color: var(--blue); text-decoration: none; display: inline-flex; align-items: center; gap: 4px;"><span style="font-size:14px">📷</span> Ver Foto</a></div>`
+        : '';
 
       return `
         <div style="border: 1px solid var(--border); border-radius: 8px; padding: 14px; background: var(--white); box-shadow: 0 1px 3px rgba(0,0,0,.02);">
           <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
-            
             <div style="font-weight: 600; font-size: 13px; color: var(--navy); line-height: 1.4;">
-              ${a.disciplina || a.DISCIPLINA || 'Sin título'}
+              ${a.actividad || a.disciplina || a.DISCIPLINA || 'Sin título'}
             </div>
             
             <div style="background: ${bg}; color: ${color}; padding: 3px 8px; border-radius: 999px; font-size: 10px; font-weight: 700; white-space: nowrap; border: 1px solid ${border};">
